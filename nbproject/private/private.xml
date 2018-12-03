@@ -3,10 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Adriano/Documents/NetBeansProjects/FinalServer/src/finalserver/ConnectionHandler.java</file>
-            <file>file:/C:/Users/Adriano/Documents/NetBeansProjects/FinalServer/src/DAO/ConnectionFactory.java</file>
-            <file>file:/C:/Users/Adriano/Documents/NetBeansProjects/FinalServer/src/finalserver/FinalServer.java</file>
-            <file>file:/C:/Users/Adriano/Documents/NetBeansProjects/FinalServer/src/finalserver/CLIClient.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/GFIServer/ServerListener.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Exceptions/InvalidCommandException.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/ConnectionFactory.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/CategoryDAO.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/GFIServer/CLIClient.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/Receipt.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/Category.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/GFIServer/Main.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/ReceiptDAO.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/User.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/GFIServer/ConnectionHandler.java</file>
+            <file>file:/C:/Users/Adriano/git/gfi-server/src/Data/UserDAO.java</file>
         </group>
     </open-files>
 </project-private>

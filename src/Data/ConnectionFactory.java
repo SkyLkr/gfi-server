@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DAO;
+package Data;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,7 +19,7 @@ public class ConnectionFactory {
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://localhost/GFI", "root", "");
+            return DriverManager.getConnection("jdbc:mysql://localhost/gfi", "root", "");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ConnectionFactory.class.getName()).log(Level.SEVERE, null, ex);
             throw new SQLException(ex.getMessage());

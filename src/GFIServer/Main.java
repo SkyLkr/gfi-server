@@ -23,7 +23,8 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            int port = Integer.parseInt(JOptionPane.showInputDialog("Número da porta:"));
+            //int port = Integer.parseInt(JOptionPane.showInputDialog("Número da porta:"));
+            int port = 25565;
             ServerSocket server = new ServerSocket(port);
             System.out.println("Servidor rodando na porta " + port);
             
