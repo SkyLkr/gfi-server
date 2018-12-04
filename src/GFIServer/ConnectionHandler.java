@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +42,6 @@ public class ConnectionHandler implements Runnable {
             Scanner s = new Scanner(client.getInputStream());
             out = new PrintStream(client.getOutputStream());
             //out = System.out;
-            out.println("bem bindo");
             
             while(s.hasNextLine()) {
                 String command = s.nextLine();
@@ -59,8 +59,12 @@ public class ConnectionHandler implements Runnable {
     
     private void runCommand(String command) throws InvalidCommandException {
         try {
-            String[] cmd = command.split(" ");
+            String[] cmd = command.split(":");
             String op = cmd[0];
+            
+            UserDAO udao;
+            ReceiptDAO rdao;
+            
             switch(op.toUpperCase()) {
                 case "ADD":
                     String type = cmd[1];
@@ -86,37 +90,100 @@ public class ConnectionHandler implements Runnable {
                     receipt.setCategory(cat);
                     receipt.setPaid(paid);
                     
-                    ReceiptDAO rdao = new ReceiptDAO();
+                    rdao = new ReceiptDAO();
                     rdao.add(receipt, this.user);
                     
-                    out.println("SUCESS:Cadastrado com sucesso!");
+                    out.println("SUCCESS:Cadastrado com sucesso!");
                     break;
                     
-                case "USER":
-                    String username = cmd[1];
-                    String password = "";
-                    if (cmd[2].equalsIgnoreCase("PASSWORD")) {
-                        password = cmd[3];
-                    } else {
-                        throw new InvalidCommandException();
+                case "GET":
+                    udao = new UserDAO();
+                    this.user = udao.get(this.user.getId());
+                    if(cmd[1].equalsIgnoreCase("SALDO")) {
+                        out.println(this.user.getMoney());
+                    } else if(cmd[1].equalsIgnoreCase("RECEBIDOS")) {
+                        double recebidos = 0;
+                        for (Receipt r : user.getReceipts()) {
+                            if (r.getValue() >= 0) {
+                                recebidos += r.getValue();
+                            }
+                        }
+                        out.println(recebidos);
+                    } else if(cmd[1].equalsIgnoreCase("DESPESAS")) {
+                        double despesas = 0;
+                        for (Receipt r : user.getReceipts()) {
+                            if (r.getValue() < 0) {
+                                despesas += r.getValue();
+                            }
+                        }
+                        out.println(Math.abs(despesas));
+                    } else if(cmd[1].equalsIgnoreCase("%")) {
+                        rdao = new ReceiptDAO();
+                        List<Receipt> receipts = rdao.getList(user.getId());
+                        
+                        int[] percent = new int[] {0,0,0,0};
+                        int total = receipts.size();
+                        
+                        for (Receipt r: receipts) {
+                            percent[(int)r.getCategory().getId()-1]++;
+                        }
+                        
+                        StringBuilder sb = new StringBuilder();
+                        
+                        for (int i = 0; i < percent.length; i++) {
+                            percent[i] *= 100;
+                            percent[i] /= total;
+                            
+                            sb.append(Integer.toString(percent[i]));
+                            sb.append(";");
+                        }
+                        
+                        out.println(sb.toString());
+                        
                     }
                     
-                    UserDAO udao = new UserDAO();
+                    break;
+                    
+                case "LOGIN":
+                    String username = cmd[1];
+                    String password = cmd[2];
+                    
+                    udao = new UserDAO();
                     
                     User user = udao.get(username);
                     
                     if (user != null) {
                         if (user.getPassword().equals(password)) {
                             this.user = user;
-                            out.println("SUCCESS:Loged in successfuly.");
+                            out.println("SUCCESS:Logado com sucesso.");
                         } else {
-                            out.println("ERROR:Incorrect Password");
+                            out.println("ERROR:Senha incorreta.");
                         }
                     } else {
-                        out.println("ERROR:User don\'t exist");
+                        out.println("ERROR:Usuário não cadastrado.");
                     }
                     
                     break;
+                    
+                case "CREATEUSER":
+                    String uname = cmd[1];
+                    String pass = cmd[2];
+                    udao = new UserDAO();
+                    
+                    User u = udao.get(uname);
+                    
+                    if (u == null) {
+                        u = new User();
+                        u.setName(uname);
+                        u.setPassword(pass);
+                        udao.add(u);
+                        out.println("SUCCESS:Usuário cadastrado com sucesso.");
+                    } else {
+                        out.println("ERROR:Usuário já está cadastrado.");
+                    }
+                    
+                    break;
+                    
                 default:
                     throw new InvalidCommandException();
             }

@@ -24,7 +24,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             //int port = Integer.parseInt(JOptionPane.showInputDialog("Número da porta:"));
-            int port = 25565;
+            int port = 12345;
             ServerSocket server = new ServerSocket(port);
             System.out.println("Servidor rodando na porta " + port);
             

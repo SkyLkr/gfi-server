@@ -22,7 +22,7 @@ public class CLIClient {
         try {
             Scanner s = new Scanner(System.in);
             //System.out.print("Porta: ");
-            int port = 25565;
+            int port = 12345;
             Socket client = new Socket("localhost", port);
             
             PrintStream out = new PrintStream(client.getOutputStream());
