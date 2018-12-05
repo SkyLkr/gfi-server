@@ -21,14 +21,14 @@ public class CategoryDAOIT {
     
     public CategoryDAOIT() throws SQLException{
         c = new Category();
+        c.setId(12);
+        c.setName("Alimentação");
         instance = new CategoryDAO();
     }
 
     @Test
     public void testAdd() throws Exception {
         System.out.println("Adicionar Categoria");
-        c.setId(1);
-        c.setName("Alimentação");
         instance.add(c);
     }
 
@@ -45,7 +45,7 @@ public class CategoryDAOIT {
         System.out.println("Busca");
         Category r;
         r = instance.search(c.getName());
-        assert(r.getId() == c.getId());
+        assert(r.getName().equals(c.getName()));
         r = instance.search("Não Existe");
         assert(r == null);
     }
@@ -55,7 +55,7 @@ public class CategoryDAOIT {
         System.out.println("Obter Categoria");
         Category r;
         r = instance.get(c.getId());
-        assert(r.getId() == c.getId());
+        assert(r.getName().equals(c.getName()));
     }
     
 }

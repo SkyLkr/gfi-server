@@ -23,13 +23,11 @@ public class ReceiptDAOIT {
     public ReceiptDAOIT() throws SQLException {
         c = new Receipt();
         instance = new ReceiptDAO();
-        u = new User();
-        u.setId(1);
-        u.setMoney(3000);
-        u.setName("Maria");
-        u.setPassword("12345");
-        c.setId(1);
-        c.setCategory(new Category());
+        UserDAO udao = new UserDAO();
+        u = udao.get(1);
+        c.setId(5);
+        CategoryDAO cdao = new CategoryDAO();
+        c.setCategory(cdao.get(1));
         c.setName("Jantar");
         c.setValue(300.00);
         c.setPaid(true);
@@ -62,7 +60,7 @@ public class ReceiptDAOIT {
         System.out.println("Obter Receita");
         Receipt r;
         r = instance.get(c.getId());
-        assert(r.getId() == c.getId());
+        assert(r.getName().equals(c.getName()));
     }
     
 }

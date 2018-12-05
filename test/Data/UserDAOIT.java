@@ -20,7 +20,7 @@ public class UserDAOIT {
     UserDAO instance;
     public UserDAOIT() throws SQLException {
         u = new User();
-        u.setId(2);
+        u.setId(5);
         u.setMoney(3000);
         u.setName("Raimunda");
         u.setPassword("12345");
@@ -38,7 +38,7 @@ public class UserDAOIT {
         System.out.println("Seleciona usuário pelo nome");
         User teste = null;
         teste = instance.get(u.getName());
-        assert(teste.getId() == u.getId());
+        assert(teste.getName().equals(u.getName()));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class UserDAOIT {
         System.out.println("Seleciona usuário pelo Id");
         User teste = null;
         teste = instance.get(u.getId());
-        assert(teste.getId() == u.getId());
+        assert(teste.getName().equals(u.getName()));
     }
     
 }

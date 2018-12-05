@@ -30,7 +30,12 @@ public class ConnectionHandler implements Runnable {
     
     private final Socket client;
     private User user;
+    private List<Category> categories;
     private PrintStream out;
+    
+    private UserDAO udao;
+    private ReceiptDAO rdao;
+    private CategoryDAO cdao;
     
     public ConnectionHandler(Socket client) {
         this.client = client;
@@ -38,7 +43,15 @@ public class ConnectionHandler implements Runnable {
 
     @Override
     public void run() {
+        
         try {
+            
+            udao = new UserDAO();
+            rdao = new ReceiptDAO();
+            cdao = new CategoryDAO();
+            
+            categories = cdao.getList();
+            
             Scanner s = new Scanner(client.getInputStream());
             out = new PrintStream(client.getOutputStream());
             //out = System.out;
@@ -54,6 +67,8 @@ public class ConnectionHandler implements Runnable {
             // TODO: Send message to client
             out.println("ERROR:" + ex.getMessage());
             //Logger.getLogger(ConnectionHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ConnectionHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -61,9 +76,6 @@ public class ConnectionHandler implements Runnable {
         try {
             String[] cmd = command.split(":");
             String op = cmd[0];
-            
-            UserDAO udao;
-            ReceiptDAO rdao;
             
             switch(op.toUpperCase()) {
                 case "ADD":
@@ -79,7 +91,6 @@ public class ConnectionHandler implements Runnable {
                     
                     double value = Double.parseDouble(cmd[2]) * valueFactor;
                     long categoryId = Long.parseLong(cmd[3]);
-                    CategoryDAO cdao = new CategoryDAO();
                     Category cat = cdao.get(categoryId);
                     String name = cmd[4];
                     boolean paid = Boolean.parseBoolean(cmd[5]);
@@ -89,16 +100,17 @@ public class ConnectionHandler implements Runnable {
                     receipt.setValue(value);
                     receipt.setCategory(cat);
                     receipt.setPaid(paid);
-                    
-                    rdao = new ReceiptDAO();
                     rdao.add(receipt, this.user);
+                    
+                    user.setMoney(user.getMoney() + receipt.getValue());
+                    
+                    udao.update(user);
+                    user = udao.get(user.getId());
                     
                     out.println("SUCCESS:Cadastrado com sucesso!");
                     break;
                     
                 case "GET":
-                    udao = new UserDAO();
-                    this.user = udao.get(this.user.getId());
                     if(cmd[1].equalsIgnoreCase("SALDO")) {
                         out.println(this.user.getMoney());
                     } else if(cmd[1].equalsIgnoreCase("RECEBIDOS")) {
@@ -118,28 +130,33 @@ public class ConnectionHandler implements Runnable {
                         }
                         out.println(Math.abs(despesas));
                     } else if(cmd[1].equalsIgnoreCase("%")) {
-                        rdao = new ReceiptDAO();
-                        List<Receipt> receipts = rdao.getList(user.getId());
+                        List<Receipt> receipts = user.getReceipts();
                         
-                        int[] percent = new int[] {0,0,0,0};
-                        int total = receipts.size();
-                        
-                        for (Receipt r: receipts) {
-                            percent[(int)r.getCategory().getId()-1]++;
+                        if (receipts.size() > 0) {
+                            int[] percent = new int[] {0,0,0,0};
+                            int total = receipts.size();
+
+                            for (Receipt r: receipts) {
+                                if (r.getValue() < 0) {
+                                    percent[((int)r.getCategory().getId())-1]++;
+                                }
+                            }
+
+                            StringBuilder sb = new StringBuilder();
+
+                            for (int i = 0; i < percent.length; i++) {
+                                percent[i] *= 100;
+                                percent[i] /= total;
+                                
+                                sb.append(categories.get(i).getName());
+                                sb.append(": ");
+                                sb.append(Integer.toString(percent[i]));
+                                sb.append("%;");
+                            }
+                            out.println(sb.toString());
+                        } else {
+                            out.println(";;;;");
                         }
-                        
-                        StringBuilder sb = new StringBuilder();
-                        
-                        for (int i = 0; i < percent.length; i++) {
-                            percent[i] *= 100;
-                            percent[i] /= total;
-                            
-                            sb.append(Integer.toString(percent[i]));
-                            sb.append(";");
-                        }
-                        
-                        out.println(sb.toString());
-                        
                     }
                     
                     break;
@@ -147,8 +164,6 @@ public class ConnectionHandler implements Runnable {
                 case "LOGIN":
                     String username = cmd[1];
                     String password = cmd[2];
-                    
-                    udao = new UserDAO();
                     
                     User user = udao.get(username);
                     
@@ -168,7 +183,6 @@ public class ConnectionHandler implements Runnable {
                 case "CREATEUSER":
                     String uname = cmd[1];
                     String pass = cmd[2];
-                    udao = new UserDAO();
                     
                     User u = udao.get(uname);
                     
